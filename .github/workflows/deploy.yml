@@ -17,7 +17,7 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.DB_HOST }}
-          username: ${{   .DB_USER }}
+          username: ${{secrets.DB_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |  
             echo "✅ Creating project folder if it doesn't exist"
