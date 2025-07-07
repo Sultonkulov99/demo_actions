@@ -1,0 +1,43 @@
+name: Deploy NestJS with Prisma to VPS using Docker Compose
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DB_HOST }}
+          username: ${{   .DB_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |  
+            echo "✅ Creating project folder if it doesn't exist"
+            mkdir -p /home/ubuntu/nest_dars
+            cd /home/ubuntu/nest_dars
+
+            if [ ! -d .git ]; then
+              echo "📥 Cloning repository"
+              git clone https://github.com/Sultonkulov99/demo_actions.git .
+            else
+              echo "📥 Pulling latest changes"
+              git pull origin main
+            fi
+
+            echo "🛑 Stopping containers"
+            docker compose down
+
+            echo "🔨 Building containers"
+            docker compose build
+
+            echo "🚀 Running containers"
+            docker compose up -d
+  
